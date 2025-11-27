@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Прайс КДЛ — Медицинский центр Федорук М.М.</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #fff;
+      color: #333;
+    }
+    .price-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .price-tab {
+      padding: 10px 20px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      user-select: none;
+    }
+    .price-tab.active {
+      background: #007bff;
+      color: white;
+    }
+    .price-content {
+      display: none;
+    }
+    .price-content.active {
+      display: block;
+    }
+    .price-search {
+      margin: 15px 0 20px;
+    }
+    input, button {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: bold;
+    }
+    .kdl-header a img {
+      height: 40px;
+      margin-right: 15px;
+    }
+    .kdl-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .kdl-header h2 {
+      margin: 0;
+      font-size: 1.4em;
+    }
+    .kdl-header p {
+      margin: 5px 0 0;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<div class="price-tabs">
+  <div class="price-tab active" onclick="switchTab('kdl-prices')">Цены КДЛ</div>
+  <div class="price-tab" onclick="switchTab('kdl-profiles')">Доп. цены КДЛ (Профили)</div>
+</div>
+
+<!-- Цены КДЛ -->
+<div id="kdl-prices" class="price-content active">
+  <div class="kdl-header">
+    <a href="https://kdl.ru/" target="_blank">
+      <img src="https://static.tildacdn.com/tild6535-3537-4165-b233-343731343166/KDL_.png" alt="KDL">
+    </a>
+    <div>
+      <h2>ПРЕЙСКУРАНТ KDL от 10.10.2023</h2>
+      <p>Цены указаны со скидкой по Карте Здоровья (5%)</p>
+    </div>
+  </div>
+  <div class="price-search">
+    <input type="text" id="search-kdl" placeholder="Поиск по услугам КДЛ..." onkeyup="filterTable('search-kdl', 'kdl-prices')" />
+    <button type="button" onclick="clearSearch('search-kdl', 'kdl-prices')">Очистить</button>
+  </div>
+  <table>
+  <tbody>
+  
+  
+  </tbody>
+</table>
+ 
+</div>
+
+<!-- Доп. цены КДЛ (Профили) -->
+<div id="kdl-profiles" class="price-content">
+  <div class="kdl-header">
+    <a href="https://kdl.ru/" target="_blank">
+      <img src="https://static.tildacdn.com/tild6535-3537-4165-b233-343731343166/KDL_.png" alt="KDL">
+    </a>
+    <div>
+      <h2>Дополнение к прейскуранту (Профили)</h2>
+      <p>Чекапы и лабораторные профили</p>
+    </div>
+  </div>
+  <div class="price-search">
+    <input type="text" id="search-profiles" placeholder="Поиск по профилям..." onkeyup="filterTable('search-profiles', 'kdl-profiles')" />
+    <button type="button" onclick="clearSearch('search-profiles', 'kdl-profiles')">Очистить</button>
+  </div>
+  <table>
+  <tbody>
+  
+  
+  </tbody>
+</table>
+
+</div>
+<script>
+async function loadHTML(targetId, filePath) {
+  try {
+    const response = await fetch(filePath);
+    const html = await response.text();
+    document.querySelector(`#${targetId} tbody`).innerHTML = html;
+  } catch (e) {
+    document.querySelector(`#${targetId} tbody`).innerHTML =
+      '<tr><td>Ошибка загрузки данных</td></tr>';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // подгружаем основную таблицу
+  loadHTML('kdl-prices', 'kdl_main_pricelist.html');
+
+  // подгружаем таблицу профилей
+  loadHTML('kdl-profiles', 'kdl_profiles.html');
+});
+</script>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.price-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.price-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  function filterTable(inputId, containerId) {
+    const input = document.getElementById(inputId);
+    const filter = input.value.toLowerCase();
+    const container = document.getElementById(containerId);
+    const rows = container.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? '' : 'none';
+    });
+  }
+
+  function clearSearch(inputId, containerId) {
+    document.getElementById(inputId).value = '';
+    document.querySelectorAll(`#${containerId} tbody tr`).forEach(row => row.style.display = '');
+  }
+
+  // Автоматическая подстройка высоты iframe (опционально)
+  window.addEventListener('load', () => {
+    const height = document.body.scrollHeight + 20;
+    window.parent.postMessage({ type: 'resize', height: height }, '*');
+  });
+</script>
+
+</body>
+</html>
